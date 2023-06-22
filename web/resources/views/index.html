@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+</head>
+<body>
+
+<form id="order">
+    <div>
+        <label for="pizzas">Выберите пиццу:</label>
+
+        <select name="pizzas" id="pizzas">
+            <?php
+                    foreach ($this->data['pizzas'] as $pizza) {
+            echo "<option value='$pizza->id'>$pizza->name</option>";
+            }
+            ?>
+        </select>
+    </div>
+    <div>
+        <label for="sizes">Выберите размер, см.:</label>
+
+        <select name="sizes" id="sizes">
+            <?php
+                    foreach ($this->data['sizes'] as $size) {
+            echo "<option value='$size->id'>$size->size</option>";
+            }
+            ?>
+        </select>
+    </div>
+    <div>
+        <label for="sauces">Выберите соус:</label>
+
+        <select name="sauces" id="sauces">
+            <option value='0'>без соуса</option>
+            <?php
+                    foreach ($this->data['sauces'] as $sauce) {
+            echo "<option value='$sauce->id'>$sauce->name</option>";
+            }
+            ?>
+        </select>
+    </div>
+    <input type="submit" value="Submit">
+</form>
+
+<ul id="receipt" style="display: none">
+</ul>
+<script>
+    $( "#order" ).submit(function( event ) {
+        $.ajax({
+            type: "POST",
+            url: "order",
+            data: $('form').serialize()
+        }).done(function(res) {
+            $("#order").css("display", "none")
+            $("#receipt").css("display", "")
+            let obj = JSON.parse(res)
+            console.log(obj)
+            for (let key in obj.report) {
+                console.log(key)
+                $("#receipt").append("<li>" + obj.report[key].name + " " + obj.report[key].price + "p.</li>")
+            }
+            $("#receipt").after("<p>Итого "+ obj.total +"</p>")
+        });
+        event.preventDefault();
+    });
+</script>
+</body>
+</html>
